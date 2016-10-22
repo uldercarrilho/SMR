@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{B65C3AD6-6117-40C4-8C53-F7FB67447931}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Group\src\GroupService.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Sequencer\src\Sequencer.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Client\src\Client.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="GroupService">
+        <MSBuild Projects="Group\src\GroupService.dproj"/>
+    </Target>
+    <Target Name="GroupService:Clean">
+        <MSBuild Projects="Group\src\GroupService.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="GroupService:Make">
+        <MSBuild Projects="Group\src\GroupService.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Sequencer">
+        <MSBuild Projects="Sequencer\src\Sequencer.dproj"/>
+    </Target>
+    <Target Name="Sequencer:Clean">
+        <MSBuild Projects="Sequencer\src\Sequencer.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Sequencer:Make">
+        <MSBuild Projects="Sequencer\src\Sequencer.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Client">
+        <MSBuild Projects="Client\src\Client.dproj"/>
+    </Target>
+    <Target Name="Client:Clean">
+        <MSBuild Projects="Client\src\Client.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Client:Make">
+        <MSBuild Projects="Client\src\Client.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="GroupService;Sequencer;Client"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="GroupService:Clean;Sequencer:Clean;Client:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="GroupService:Make;Sequencer:Make;Client:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
