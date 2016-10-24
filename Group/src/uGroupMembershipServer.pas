@@ -13,6 +13,8 @@ type
     procedure DestroyGroup(const AName: string);
 
     procedure Join(const AMemberId, AMemberAddress: string; AMemberType: Byte; const AGroupName: string);
+    procedure Leave(const AMemberId, AGroupName: string);
+    procedure SendMessage(const AMemberId, AGroupName, AMessage: string);
   end;
   {$METHODINFO OFF}
 
@@ -56,6 +58,26 @@ begin
   CriticalSection.Enter;
   try
     GroupMembership.Join(AMemberId, AMemberAddress, AMemberType, AGroupName);
+  finally
+    CriticalSection.Leave;
+  end;
+end;
+
+procedure TGroupMembershipServer.Leave(const AMemberId, AGroupName: string);
+begin
+  CriticalSection.Enter;
+  try
+    GroupMembership.Leave(AMemberId, AGroupName);
+  finally
+    CriticalSection.Leave;
+  end;
+end;
+
+procedure TGroupMembershipServer.SendMessage(const AMemberId, AGroupName, AMessage: string);
+begin
+  CriticalSection.Enter;
+  try
+    GroupMembership.SendMessage(AMemberId, AGroupName, AMessage);
   finally
     CriticalSection.Leave;
   end;

@@ -33,6 +33,7 @@ type
     procedure tmrStatusTimer(Sender: TObject);
   private
     { Private declarations }
+    procedure RefreshMembers;
     procedure UpdateVisualControls;
     procedure StartService;
     procedure StopService;
@@ -56,6 +57,11 @@ uses
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   UpdateVisualControls;
+end;
+
+procedure TfrmMain.RefreshMembers;
+begin
+  // verifica se os membros estão ativos
 end;
 
 procedure TfrmMain.btnActiveClick(Sender: TObject);
@@ -117,6 +123,7 @@ end;
 
 procedure TfrmMain.tmrStatusTimer(Sender: TObject);
 begin
+  RefreshMembers;
   UpdateMembers(lvClients, 'Clients');
   UpdateMembers(lvPrimary, 'Primary');
   UpdateMembers(lvBackup, 'Backup');
