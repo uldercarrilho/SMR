@@ -6,6 +6,9 @@
         <Projects Include="Group\src\GroupService.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="Tests\Group\src\GroupServiceTests.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="Sequencer\src\Sequencer.dproj">
             <Dependencies/>
         </Projects>
@@ -29,6 +32,15 @@
     <Target Name="GroupService:Make">
         <MSBuild Projects="Group\src\GroupService.dproj" Targets="Make"/>
     </Target>
+    <Target Name="GroupServiceTests">
+        <MSBuild Projects="Tests\Group\src\GroupServiceTests.dproj"/>
+    </Target>
+    <Target Name="GroupServiceTests:Clean">
+        <MSBuild Projects="Tests\Group\src\GroupServiceTests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="GroupServiceTests:Make">
+        <MSBuild Projects="Tests\Group\src\GroupServiceTests.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Sequencer">
         <MSBuild Projects="Sequencer\src\Sequencer.dproj"/>
     </Target>
@@ -48,13 +60,13 @@
         <MSBuild Projects="Client\src\Client.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="GroupService;Sequencer;Client"/>
+        <CallTarget Targets="GroupService;GroupServiceTests;Sequencer;Client"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="GroupService:Clean;Sequencer:Clean;Client:Clean"/>
+        <CallTarget Targets="GroupService:Clean;GroupServiceTests:Clean;Sequencer:Clean;Client:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="GroupService:Make;Sequencer:Make;Client:Make"/>
+        <CallTarget Targets="GroupService:Make;GroupServiceTests:Make;Sequencer:Make;Client:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
