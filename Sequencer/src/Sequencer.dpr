@@ -2,7 +2,9 @@ program Sequencer;
 
 uses
   Vcl.Forms,
-  uMain in 'uMain.pas' {frmMain};
+  uMain in 'uMain.pas' {frmMain},
+  uInternetUtils in 'uInternetUtils.pas',
+  uGroupMembershipClient in 'uGroupMembershipClient.pas';
 
 {$R *.res}
 
