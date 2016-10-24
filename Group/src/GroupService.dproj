@@ -103,6 +103,9 @@
             <Form>frmMain</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="uGroupMembership.pas"/>
+        <DCCReference Include="uGroupMembershipServer.pas"/>
+        <DCCReference Include="uGroupMembershipAPI.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -129,7 +132,7 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="2">
-                <DeployFile LocalName="Win32\Debug\GroupService.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\bin\GroupService.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>GroupService.exe</RemoteName>
                         <Overwrite>true</Overwrite>

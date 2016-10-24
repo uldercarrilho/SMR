@@ -2,7 +2,10 @@ program GroupService;
 
 uses
   Vcl.Forms,
-  uMain in 'uMain.pas' {frmMain};
+  uMain in 'uMain.pas' {frmMain},
+  uGroupMembership in 'uGroupMembership.pas',
+  uGroupMembershipServer in 'uGroupMembershipServer.pas',
+  uGroupMembershipAPI in 'uGroupMembershipAPI.pas';
 
 {$R *.res}
 
