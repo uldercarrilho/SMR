@@ -99,10 +99,13 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="uMain.pas">
-            <Form>frmMain</Form>
+        <DCCReference Include="ufrmClient.pas">
+            <Form>frmClient</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="uGMServiceClient.pas"/>
+        <DCCReference Include="uSequencerClient.pas"/>
+        <DCCReference Include="uExceptions.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -529,6 +532,10 @@
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">False</Platform>
             </Platforms>
+            <DataSnapProxyLookup>
+                <uGroupMembershipClient>{99A971DB-8FFF-49D0-BEB7-C0DCFF670FE5}</uGroupMembershipClient>
+                <uSequencerClient>{8096F810-E1C0-4B5A-BA4C-5F2C157A6419}</uSequencerClient>
+            </DataSnapProxyLookup>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>
