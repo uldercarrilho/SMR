@@ -1,4 +1,4 @@
-unit uMain;
+unit ufrmGroupMembership;
 
 interface
 
@@ -6,10 +6,11 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, uGroupMembership, IdBaseComponent, IdComponent, IdCustomTCPServer,
   IdTCPServer, IdContext, IPPeerServer, Datasnap.DSCommonServer, Datasnap.DSTCPServerTransport, Datasnap.DSServer,
-  System.ImageList, Vcl.ImgList, Vcl.ComCtrls, Vcl.ExtCtrls;
+  System.ImageList, Vcl.ImgList, Vcl.ComCtrls, Vcl.ExtCtrls, uGMS.Group, Data.DBXDataSnap, IPPeerClient, Data.DBXCommon,
+  Data.DB, Data.SqlExpr;
 
 type
-  TfrmMain = class(TForm)
+  TfrmGroupMembership = class(TForm)
     grpServiceConfig: TGroupBox;
     edtPort: TEdit;
     lblPort: TLabel;
@@ -33,38 +34,37 @@ type
     procedure tmrStatusTimer(Sender: TObject);
   private
     { Private declarations }
+    FGroupBackup: TGroup;
+    FGroupPrimary: TGroup;
+    FGroupClients: TGroup;
     procedure RefreshMembers;
+    procedure ChooseNewPrimary;
     procedure UpdateVisualControls;
     procedure StartService;
     procedure StopService;
     procedure CreateGroups;
     procedure DestroyGroups;
-    procedure UpdateMembers(AListView: TListView; const AGroupName: string);
+    procedure UpdateListView(AListView: TListView; const AGroup: TGroup);
   public
     { Public declarations }
   end;
 
 var
-  frmMain: TfrmMain;
+  frmGroupMembership: TfrmGroupMembership;
 
 implementation
 
 uses
-  uGroupMembershipAPI, uGroupMembershipServer;
+  System.SyncObjs, uGMS.Member, uGMS.Service;
 
 {$R *.dfm}
 
-procedure TfrmMain.FormCreate(Sender: TObject);
+procedure TfrmGroupMembership.FormCreate(Sender: TObject);
 begin
   UpdateVisualControls;
 end;
 
-procedure TfrmMain.RefreshMembers;
-begin
-  // verifica se os membros estão ativos
-end;
-
-procedure TfrmMain.btnActiveClick(Sender: TObject);
+procedure TfrmGroupMembership.btnActiveClick(Sender: TObject);
 begin
   if DSServer.Started then
     StopService
@@ -74,41 +74,43 @@ begin
   UpdateVisualControls;
 end;
 
-procedure TfrmMain.StartService;
+procedure TfrmGroupMembership.StartService;
 begin
   CreateGroups;
-
   DSTCPServerTransport.Port := StrToInt(edtPort.Text);
   DSServer.Start;
 end;
 
-procedure TfrmMain.CreateGroups;
+procedure TfrmGroupMembership.CreateGroups;
 begin
-  GroupMembership.CreateGroup('Clients');
-  GroupMembership.CreateGroup('Primary', 1, gaRestrict, 'Clients');
-  GroupMembership.CreateGroup('Backup', GROUP_UNLIMITED, gaRestrict, 'Primary');
+  FGroupClients := GMSManager.CreateGroup('Clients');
+  FGroupPrimary := GMSManager.CreateGroup('Primary', 1, gaRestrict, 'Clients');
+  FGroupBackup := GMSManager.CreateGroup('Backup', GROUP_UNLIMITED, gaRestrict, 'Primary');
 end;
 
-procedure TfrmMain.StopService;
+procedure TfrmGroupMembership.StopService;
 begin
   DSServer.Stop;
-
   DestroyGroups;
 end;
 
-procedure TfrmMain.DestroyGroups;
+procedure TfrmGroupMembership.DestroyGroups;
 begin
-  GroupMembership.DestroyGroup('Clients');
-  GroupMembership.DestroyGroup('Primary');
-  GroupMembership.DestroyGroup('Backup');
+  FGroupBackup := nil;
+  FGroupPrimary := nil;
+  FGroupClients := nil;
+
+  GMSManager.DestroyGroup('Clients');
+  GMSManager.DestroyGroup('Primary');
+  GMSManager.DestroyGroup('Backup');
 end;
 
-procedure TfrmMain.DSServerClassGetClass(DSServerClass: TDSServerClass; var PersistentClass: TPersistentClass);
+procedure TfrmGroupMembership.DSServerClassGetClass(DSServerClass: TDSServerClass; var PersistentClass: TPersistentClass);
 begin
-  PersistentClass := TGroupMembershipServer;
+  PersistentClass := TGMService;
 end;
 
-procedure TfrmMain.UpdateVisualControls;
+procedure TfrmGroupMembership.UpdateVisualControls;
 const
   STATUS_COLOR: array[Boolean] of TColor = (clRed, clGreen);
   STATUS_CAPTION: array[Boolean] of string = ('Inactive', 'Active');
@@ -121,26 +123,48 @@ begin
   tmrStatus.Enabled := DSServer.Started;
 end;
 
-procedure TfrmMain.tmrStatusTimer(Sender: TObject);
+procedure TfrmGroupMembership.tmrStatusTimer(Sender: TObject);
 begin
   RefreshMembers;
-  UpdateMembers(lvClients, 'Clients');
-  UpdateMembers(lvPrimary, 'Primary');
-  UpdateMembers(lvBackup, 'Backup');
+  UpdateListView(lvClients, FGroupClients);
+  UpdateListView(lvPrimary, FGroupPrimary);
+  UpdateListView(lvBackup, FGroupBackup);
 end;
 
-procedure TfrmMain.UpdateMembers(AListView: TListView; const AGroupName: string);
+procedure TfrmGroupMembership.RefreshMembers;
+begin
+  CSGMSManager.Enter;
+  try
+    GMSManager.RemoveMembersInactive;
+    if FGroupPrimary.MemberCount = 0 then
+      ChooseNewPrimary;
+  finally
+    CSGMSManager.Leave;
+  end;
+end;
+
+procedure TfrmGroupMembership.ChooseNewPrimary;
+var
+  Member: TMember;
+begin
+  if FGroupBackup.MemberCount = 0 then
+    Exit;
+
+  Member := FGroupBackup.Member[0];
+  GMSManager.Join(Member.Id, Member.Address, Member.Kind, 'Primary');
+  GMSManager.Leave(Member.Id, 'Backup');
+end;
+
+procedure TfrmGroupMembership.UpdateListView(AListView: TListView; const AGroup: TGroup);
 var
   i: Integer;
   Member: TMember;
   Item: TListItem;
-  Group: TGroup;
 begin
   AListView.Items.Clear;
-  Group := GroupMembership.Group[AGroupName];
-  for i := 0 to Group.Members.Count - 1 do
+  for i := 0 to AGroup.MemberCount - 1 do
   begin
-    Member := Group.Member[i];
+    Member := AGroup.Member[i];
 
     Item := AListView.Items.Add;
     Item.Caption := Member.Id;
