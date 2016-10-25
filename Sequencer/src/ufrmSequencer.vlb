@@ -13,9 +13,6 @@ Coordinates=83,212,69,36
 [lblPort]
 Coordinates=331,10,51,58
 
-[lstEvents]
-Coordinates=10,10,101,124
-
 [lblStatus]
 Coordinates=10,144,64,58
 
@@ -26,7 +23,7 @@ Coordinates=10,212,63,58
 Coordinates=175,10,76,58
 
 []
-Coordinates=84,144,139,58
+Coordinates=10,10,101,124
 
 [Module Settings]
 ModelLayerNames=

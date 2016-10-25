@@ -18,7 +18,7 @@ begin
   GetHostName(@Buffer, 255);
   RemoteHost := GetHostByName(Buffer);
   if RemoteHost = nil then
-    Result := htonl($07000001) { 127.0.0.1 }
+    Result := htonl($7F000001) { 127.0.0.1 }
   else
     Result := longint(pointer(RemoteHost^.h_addr_list^)^);
 

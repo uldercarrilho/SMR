@@ -1,11 +1,11 @@
-object frmMain: TfrmMain
+object frmSequencer: TfrmSequencer
   Left = 0
   Top = 0
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Sequencer'
   ClientHeight = 275
-  ClientWidth = 432
+  ClientWidth = 577
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -21,17 +21,9 @@ object frmMain: TfrmMain
   object lblEventsHistory: TLabel
     Left = 196
     Top = 8
-    Width = 74
+    Width = 80
     Height = 13
-    Caption = 'Events History:'
-  end
-  object lstEvents: TListBox
-    Left = 196
-    Top = 27
-    Width = 225
-    Height = 238
-    ItemHeight = 13
-    TabOrder = 0
+    Caption = 'Purchase Orders'
   end
   object grpService: TGroupBox
     Left = 8
@@ -39,7 +31,7 @@ object frmMain: TfrmMain
     Width = 182
     Height = 163
     Caption = ' Sequencer Service '
-    TabOrder = 1
+    TabOrder = 0
     object lblPort: TLabel
       Left = 43
       Top = 24
@@ -116,7 +108,7 @@ object frmMain: TfrmMain
     Width = 182
     Height = 88
     Caption = ' Group Membership '
-    TabOrder = 2
+    TabOrder = 1
     object lblGroupHostName: TLabel
       Left = 12
       Top = 24
@@ -148,6 +140,14 @@ object frmMain: TfrmMain
       Text = '400'
     end
   end
+  object mmoPurchaseOrders: TMemo
+    Left = 196
+    Top = 27
+    Width = 373
+    Height = 240
+    ScrollBars = ssVertical
+    TabOrder = 2
+  end
   object SQLConnection: TSQLConnection
     DriverName = 'DataSnap'
     LoginPrompt = False
@@ -161,8 +161,25 @@ object frmMain: TfrmMain
         'DriverAssemblyLoader=Borland.Data.TDBXClientDriverLoader,Borland' +
         '.Data.DbxClientDriver,Version=23.0.0.0,Culture=neutral,PublicKey' +
         'Token=91d62ebb5b0d1b1b')
-    Left = 320
-    Top = 88
+    Left = 352
+    Top = 40
     UniqueId = '{94C681A4-D8D3-4914-A582-6D36E3CCEC4D}'
+  end
+  object DSServer: TDSServer
+    AutoStart = False
+    Left = 240
+    Top = 40
+  end
+  object DSServerClass: TDSServerClass
+    OnGetClass = DSServerClassGetClass
+    Server = DSServer
+    Left = 240
+    Top = 104
+  end
+  object DSTCPServerTransport: TDSTCPServerTransport
+    Server = DSServer
+    Filters = <>
+    Left = 240
+    Top = 168
   end
 end

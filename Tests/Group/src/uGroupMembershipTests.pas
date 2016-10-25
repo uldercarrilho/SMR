@@ -3,13 +3,13 @@ unit uGroupMembershipTests;
 interface
 
 uses
-  DUnitX.TestFramework, uGroupMembership;
+  DUnitX.TestFramework, uGMS.Manager, uGMS.Member;
 
 type
   [TestFixture]
   TGroupMembershipTests = class(TObject)
   private
-    FGroupMembership: TGroupMembership;
+    FGroupMembership: TManager;
     procedure CreateGroupClients;
     procedure CreateGroupEmpty;
     procedure JoinGroupNotExists;
@@ -29,7 +29,7 @@ type
 implementation
 
 uses
-  System.SysUtils, uGroupMembershipAPI;
+  System.SysUtils, uGroupMembershipAPI, uGMS.Exceptions, uGMS.Group;
 
 procedure TGroupMembershipTests.CreateGroupClients;
 begin
@@ -68,7 +68,7 @@ end;
 
 procedure TGroupMembershipTests.Setup;
 begin
-  FGroupMembership := TGroupMembership.Create;
+  FGroupMembership := TManager.Create;
 end;
 
 procedure TGroupMembershipTests.TearDown;

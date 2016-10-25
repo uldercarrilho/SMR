@@ -2,15 +2,16 @@ program Sequencer;
 
 uses
   Vcl.Forms,
-  uMain in 'uMain.pas' {frmMain},
+  ufrmSequencer in 'ufrmSequencer.pas' {frmSequencer},
   uInternetUtils in 'uInternetUtils.pas',
-  uGroupMembershipClient in 'uGroupMembershipClient.pas';
+  uGMServiceClient in 'uGMServiceClient.pas',
+  uSequencer in 'uSequencer.pas';
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TfrmMain, frmMain);
+  Application.CreateForm(TfrmSequencer, frmSequencer);
   Application.Run;
 end.

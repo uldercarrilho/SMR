@@ -1,4 +1,4 @@
-unit uMain;
+unit ufrmSequencer;
 
 interface
 
@@ -6,11 +6,11 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, IdBaseComponent, IdComponent, IdCustomTCPServer, IdTCPServer,
   IdSocketHandle, IdThread, IdContext, IdTCPConnection, IdTCPClient, Data.DBXDataSnap, IPPeerClient, Data.DBXCommon,
-  Data.DB, Data.SqlExpr, uGroupMembershipClient;
+  Data.DB, Data.SqlExpr, uGMServiceClient, IPPeerServer, Datasnap.DSCommonServer, Datasnap.DSTCPServerTransport,
+  Datasnap.DSServer;
 
 type
-  TfrmMain = class(TForm)
-    lstEvents: TListBox;
+  TfrmSequencer = class(TForm)
     lblEventsHistory: TLabel;
     grpService: TGroupBox;
     edtServicePort: TEdit;
@@ -27,59 +27,68 @@ type
     edtGroupPort: TEdit;
     lblGroupHostName: TLabel;
     lblGroupPort: TLabel;
+    DSServer: TDSServer;
+    DSServerClass: TDSServerClass;
+    DSTCPServerTransport: TDSTCPServerTransport;
+    mmoPurchaseOrders: TMemo;
     procedure FormDestroy(Sender: TObject);
     procedure btnActiveClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure DSServerClassGetClass(DSServerClass: TDSServerClass; var PersistentClass: TPersistentClass);
   private
     { Private declarations }
     FId: string;
-    FKind: Byte;
+    FImageIndex: Byte;
     FIP: string;
-    FGroupMembership: TGroupMembershipClient;
+    FGroupMembership: TGMServiceClient;
     function GetGroupName: string;
     procedure UpdateVisualControls;
     procedure ConnectGroupMembership;
+    procedure DisconnectGroupMembership;
     procedure RegisterService;
     procedure UnregisterService;
     procedure StartService;
     procedure StopService;
   public
     { Public declarations }
+    procedure NotifyNewOrder(const AOrderInfo: string);
+    property Id: string read FId;
+    property GroupMembership: TGMServiceClient read FGroupMembership;
   end;
 
 var
-  frmMain: TfrmMain;
+  frmSequencer: TfrmSequencer;
 
 implementation
 
 uses
-  IdGlobal, uInternetUtils;
+  IdGlobal, uInternetUtils, uSequencer;
 
 {$R *.dfm}
 
-procedure TfrmMain.FormCreate(Sender: TObject);
+procedure TfrmSequencer.FormCreate(Sender: TObject);
 begin
   FId := IntToStr(Random(MaxInt));
-  FKind := 0; // TODO : map to GroupService
+  FImageIndex := 4; // TfrmGroupMembership.ImageList
   FIP := GetIPAddressAsString;
+
+  Caption := Format('Sequencer (ID: %s)', [FId]);
 
   UpdateVisualControls;
 end;
 
-procedure TfrmMain.FormDestroy(Sender: TObject);
+procedure TfrmSequencer.FormDestroy(Sender: TObject);
 begin
-  StopService;
+  if SQLConnection.Connected then
+    StopService;
 end;
 
-function TfrmMain.GetGroupName: string;
+procedure TfrmSequencer.DSServerClassGetClass(DSServerClass: TDSServerClass; var PersistentClass: TPersistentClass);
 begin
-  if rbPrimary.Checked then
-    Result := 'Primary'
-  else
-    Result := 'Backup';
+  PersistentClass := TSequencer;
 end;
 
-procedure TfrmMain.btnActiveClick(Sender: TObject);
+procedure TfrmSequencer.btnActiveClick(Sender: TObject);
 begin
   if SQLConnection.Connected then
     StopService
@@ -89,11 +98,14 @@ begin
   UpdateVisualControls;
 end;
 
-procedure TfrmMain.StartService;
+procedure TfrmSequencer.StartService;
 begin
   try
     ConnectGroupMembership;
     RegisterService;
+
+    DSTCPServerTransport.Port := StrToInt(edtServicePort.Text);
+    DSServer.Start;
   except
     on E: Exception do
     begin
@@ -103,37 +115,56 @@ begin
   end;
 end;
 
-procedure TfrmMain.ConnectGroupMembership;
+procedure TfrmSequencer.ConnectGroupMembership;
 begin
   SQLConnection.Params.Values['HostName'] := edtGroupHostName.Text;
   SQLConnection.Params.Values['Port'] := edtGroupPort.Text;
   SQLConnection.Connected := True;
 end;
 
-procedure TfrmMain.RegisterService;
+procedure TfrmSequencer.RegisterService;
 var
   MyAddress: string;
 begin
   MyAddress := FIP + ':' + edtServicePort.Text;
 
-  FGroupMembership := TGroupMembershipClient.Create(SQLConnection.DBXConnection);
-  FGroupMembership.Join(FId, MyAddress, 0, GetGroupName);
+  FGroupMembership := TGMServiceClient.Create(SQLConnection.DBXConnection);
+  FGroupMembership.Join(FId, MyAddress, FImageIndex, GetGroupName);
 end;
 
-procedure TfrmMain.StopService;
+function TfrmSequencer.GetGroupName: string;
 begin
-  UnregisterService;
-  FreeAndNil(FGroupMembership);
-  SQLConnection.Connected := False;
+  if rbPrimary.Checked then
+    Result := 'Primary'
+  else
+    Result := 'Backup';
 end;
 
-procedure TfrmMain.UnregisterService;
+procedure TfrmSequencer.NotifyNewOrder(const AOrderInfo: string);
+begin
+  mmoPurchaseOrders.Lines.Append(AOrderInfo);
+end;
+
+procedure TfrmSequencer.StopService;
+begin
+  DSServer.Stop;
+  UnregisterService;
+  DisconnectGroupMembership;
+end;
+
+procedure TfrmSequencer.UnregisterService;
 begin
   if Assigned(FGroupMembership) then
     FGroupMembership.Leave(FId, GetGroupName);
 end;
 
-procedure TfrmMain.UpdateVisualControls;
+procedure TfrmSequencer.DisconnectGroupMembership;
+begin
+  FreeAndNil(FGroupMembership);
+  SQLConnection.Connected := False;
+end;
+
+procedure TfrmSequencer.UpdateVisualControls;
 const
   STATUS_COLOR: array[Boolean] of TColor = (clRed, clGreen);
   STATUS_CAPTION: array[Boolean] of string = ('Inactive', 'Active');

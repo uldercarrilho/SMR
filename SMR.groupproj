@@ -3,7 +3,7 @@
         <ProjectGuid>{B65C3AD6-6117-40C4-8C53-F7FB67447931}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="Group\src\GroupService.dproj">
+        <Projects Include="Group\src\GroupMembershipService.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="Tests\Group\src\GroupServiceTests.dproj">
@@ -23,14 +23,14 @@
             <Default.Personality/>
         </BorlandProject>
     </ProjectExtensions>
-    <Target Name="GroupService">
-        <MSBuild Projects="Group\src\GroupService.dproj"/>
+    <Target Name="GroupMembershipService">
+        <MSBuild Projects="Group\src\GroupMembershipService.dproj"/>
     </Target>
-    <Target Name="GroupService:Clean">
-        <MSBuild Projects="Group\src\GroupService.dproj" Targets="Clean"/>
+    <Target Name="GroupMembershipService:Clean">
+        <MSBuild Projects="Group\src\GroupMembershipService.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="GroupService:Make">
-        <MSBuild Projects="Group\src\GroupService.dproj" Targets="Make"/>
+    <Target Name="GroupMembershipService:Make">
+        <MSBuild Projects="Group\src\GroupMembershipService.dproj" Targets="Make"/>
     </Target>
     <Target Name="GroupServiceTests">
         <MSBuild Projects="Tests\Group\src\GroupServiceTests.dproj"/>
@@ -60,13 +60,13 @@
         <MSBuild Projects="Client\src\Client.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="GroupService;GroupServiceTests;Sequencer;Client"/>
+        <CallTarget Targets="GroupMembershipService;GroupServiceTests;Sequencer;Client"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="GroupService:Clean;GroupServiceTests:Clean;Sequencer:Clean;Client:Clean"/>
+        <CallTarget Targets="GroupMembershipService:Clean;GroupServiceTests:Clean;Sequencer:Clean;Client:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="GroupService:Make;GroupServiceTests:Make;Sequencer:Make;Client:Make"/>
+        <CallTarget Targets="GroupMembershipService:Make;GroupServiceTests:Make;Sequencer:Make;Client:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
