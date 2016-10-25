@@ -13,8 +13,6 @@ type
     procedure CreateGroupClients;
     procedure CreateGroupEmpty;
     procedure JoinGroupNotExists;
-    procedure JoinMember;
-    function CreateMember: TMember;
   public
     [Setup]
     procedure Setup;
@@ -41,29 +39,9 @@ begin
   FGroupMembership.CreateGroup(' ');
 end;
 
-function TGroupMembershipTests.CreateMember: TMember;
-begin
-  Result := TMember.Create;
-  Result.Id := '1';
-  Result.Kind := 0;
-  Result.HostName := '127.0.0.1';
-  Result.Port := 5000;
-end;
-
 procedure TGroupMembershipTests.JoinGroupNotExists;
 begin
   FGroupMembership.Join('1', '127.0.0.1:501', 0, 'Group not exists');
-end;
-
-procedure TGroupMembershipTests.JoinMember;
-var
-  Member: TMember;
-begin
-  Member := TMember.Create;
-  Member.Id := '1';
-  Member.Kind := 0;
-  Member.HostName := '127.0.0.1';
-  Member.Port := 5000;
 end;
 
 procedure TGroupMembershipTests.Setup;

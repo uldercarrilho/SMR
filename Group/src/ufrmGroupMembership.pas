@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, uGroupMembership, IdBaseComponent, IdComponent, IdCustomTCPServer,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, IdBaseComponent, IdComponent, IdCustomTCPServer,
   IdTCPServer, IdContext, IPPeerServer, Datasnap.DSCommonServer, Datasnap.DSTCPServerTransport, Datasnap.DSServer,
   System.ImageList, Vcl.ImgList, Vcl.ComCtrls, Vcl.ExtCtrls, uGMS.Group, Data.DBXDataSnap, IPPeerClient, Data.DBXCommon,
   Data.DB, Data.SqlExpr;

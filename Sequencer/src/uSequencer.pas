@@ -6,8 +6,6 @@ uses
   System.Classes;
 
 type
-  TOnNotifyNewOrder = procedure (const AOrderInfo: string);
-
   {$METHODINFO ON}
   TSequencer = class(TPersistent)
   private
