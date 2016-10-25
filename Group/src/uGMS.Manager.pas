@@ -21,7 +21,7 @@ type
       const AAccess: TGroupAccess = gaOpen; const APermissions: string = ''): TGroup;
     procedure DestroyGroup(const AName: string);
 
-    procedure Join(const AMemberId, AMemberAddress: string; AMemberType: Byte; const AGroupName: string);
+    procedure Join(const AMemberId, AMemberAddress: string; AMemberImageIndex: Byte; const AGroupName: string);
     procedure Leave(const AMemberId, AGroupName: string);
     procedure RemoveMembersInactive;
     function SendMessage(const ASenderId, AGroupName, AMessage: string): string;
@@ -95,7 +95,7 @@ begin
   end;
 end;
 
-procedure TManager.Join(const AMemberId, AMemberAddress: string; AMemberType: Byte; const AGroupName: string);
+procedure TManager.Join(const AMemberId, AMemberAddress: string; AMemberImageIndex: Byte; const AGroupName: string);
 var
   Index: Integer;
   Group: TGroup;
@@ -112,7 +112,7 @@ begin
 
   Member := TMember.Create;
   Member.Id := AMemberId;
-  Member.Kind := AMemberType;
+  Member.ImageIndex := AMemberImageIndex;
   Member.Address := AMemberAddress;
 
   Group.AddMember(Member);
@@ -149,8 +149,13 @@ var
   Response: string;
 begin
   try
-    Response := Send(AMember.HostName, AMember.Port, CMD_CHECK_STATUS);
-    Result := (Response = CMD_CHECK_STATUS_RESPONSE);
+    if AMember.HostName = '' then
+      Result := True
+    else
+    begin
+      Response := Send(AMember.HostName, AMember.Port, CMD_CHECK_STATUS);
+      Result := (Response = CMD_CHECK_STATUS_RESPONSE);
+    end;
   except
     Result := False;
   end;
@@ -222,7 +227,7 @@ begin
   case GroupDest.Access of
     gaOpen: MemberHasPermission := True;
     gaClosed: MemberHasPermission := GroupDest.MemberExists(ASenderId);
-    gaRestrict: MemberHasPermission := CheckPermissions;
+    gaRestrict: MemberHasPermission := GroupDest.MemberExists(ASenderId) or CheckPermissions;
   else
     MemberHasPermission := False;
   end;
@@ -230,12 +235,12 @@ begin
     raise EMemberPermission.Create;
 
   // broadcast message to members group
+  Result := '';
   for i := 0 to GroupDest.MemberCount - 1 do
   begin
     MemberDest := TMember(GroupDest.Member[i]);
-    Send(MemberDest.HostName, MemberDest.Port, AMessage);
+    Result := Result + Send(MemberDest.HostName, MemberDest.Port, AMessage) + '|';
   end;
-  Result := 'OK';
 end;
 
 function TManager.GetGroup(Name: string): TGroup;

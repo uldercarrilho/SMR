@@ -125,11 +125,19 @@ end;
 procedure TfrmSequencer.RegisterService;
 var
   MyAddress: string;
+  PrimarySequence: string;
 begin
   MyAddress := FIP + ':' + edtServicePort.Text;
 
   FGroupMembership := TGMServiceClient.Create(SQLConnection.DBXConnection);
   FGroupMembership.Join(FId, MyAddress, FImageIndex, GetGroupName);
+
+  // update SequenceOrder with Primary value
+  if rbBackup.Checked then
+  begin
+    PrimarySequence := FGroupMembership.SendMessage(FId, 'Primary', CMD_GET_SEQUENCE);
+    SequenceOrder := StrToInt(Fetch(PrimarySequence, '|'));
+  end;
 end;
 
 function TfrmSequencer.GetGroupName: string;
@@ -150,6 +158,8 @@ begin
   DSServer.Stop;
   UnregisterService;
   DisconnectGroupMembership;
+  SequenceOrder := 0;
+  mmoPurchaseOrders.Lines.Add('[stop service]');
 end;
 
 procedure TfrmSequencer.UnregisterService;

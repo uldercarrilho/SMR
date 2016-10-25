@@ -115,9 +115,10 @@ begin
       until not RetrySequencer;
     except
       on E: EConnSequencer do
-        raise E;
+        raise EConnSequencer.Create;
     else
       RetryGroupMembership := True;
+      DisconnectFromGroupMembership;
     end;
   until not RetryGroupMembership;
 end;
@@ -215,6 +216,10 @@ end;
 
 procedure TfrmClient.DisconnectFromGroupMembership;
 begin
+  try
+    FGroupMembership.Leave(FId, 'Clients');
+  except
+  end;
   SQLConnGroupMembership.Connected := False;
   FreeAndNil(FGroupMembership);
 end;

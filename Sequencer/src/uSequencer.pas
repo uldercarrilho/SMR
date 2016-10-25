@@ -5,6 +5,14 @@ interface
 uses
   System.Classes;
 
+const
+  CMD_UPDATE_SEQUENCE = 'UPDATE_SEQUENCE';
+  CMD_SUCCESS_RESPONSE = 'OK';
+  CMD_CHECK_STATUS = 'CHECK_STATUS';
+  CMD_CHECK_STATUS_RESPONSE = 'ACTIVE';
+  CMD_UPDATE_MODE_TO_PRIMARY = 'UPDATE_MODE_TO_PRIMARY';
+  CMD_GET_SEQUENCE = 'GET_SEQUENCE';
+
 type
   {$METHODINFO ON}
   TSequencer = class(TPersistent)
@@ -16,20 +24,16 @@ type
   end;
   {$METHODINFO OFF}
 
+var
+  SequenceOrder: Integer = 0;
+
 implementation
 
 uses
   System.SyncObjs, System.SysUtils, uGMServiceClient, IdGlobal, ufrmSequencer;
 
-const
-  CMD_UPDATE_SEQUENCE = 'UPDATE_SEQUENCE';
-  CMD_UPDATE_SEQUENCE_RESPONSE = 'OK';
-  CMD_CHECK_STATUS = 'CHECK_STATUS';
-  CMD_CHECK_STATUS_RESPONSE = 'ACTIVE';
-
 var
   CriticalSection: TCriticalSection;
-  SequenceOrder: Integer = 0;
 
 { TSequenceServer }
 
@@ -42,11 +46,20 @@ begin
   if Command = CMD_UPDATE_SEQUENCE then
   begin
     SequenceOrder := StrToInt(AMessage);
-    Result := CMD_UPDATE_SEQUENCE_RESPONSE;
+    Result := CMD_SUCCESS_RESPONSE;
+  end
+  else
+  if Command = CMD_UPDATE_MODE_TO_PRIMARY then
+  begin
+    frmSequencer.rbPrimary.Checked := True;
+    Result := '';
   end
   else
   if Command = CMD_CHECK_STATUS then
-    Result := CMD_CHECK_STATUS_RESPONSE;
+    Result := CMD_CHECK_STATUS_RESPONSE
+  else
+  if Command = CMD_GET_SEQUENCE then
+    Result := IntToStr(SequenceOrder);
 end;
 
 function TSequencer.PurchaseOrder(const AClientId, AOrderId: string): Integer;

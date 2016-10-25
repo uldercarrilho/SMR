@@ -6,7 +6,7 @@ type
   TMember = class
   private
     FId: string;
-    FKind: Word;
+    FImageIndex: Word;
     FHostName: string;
     FPort: Word;
   private
@@ -14,10 +14,10 @@ type
     procedure SetAddress(const Value: string);
   public
     property Id: string read FId write FId;
-    property Kind: Word read FKind write FKind;
+    property ImageIndex: Word read FImageIndex write FImageIndex;
+    property Address: string read GetAddress write SetAddress;
     property HostName: string read FHostName write FHostName;
     property Port: Word read FPort write FPort;
-    property Address: string read GetAddress write SetAddress;
   end;
 
 implementation

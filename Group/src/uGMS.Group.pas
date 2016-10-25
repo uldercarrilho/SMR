@@ -105,18 +105,18 @@ begin
     RemoveMember(Index);
 end;
 
+procedure TGroup.RemoveMember(const AIndex: Integer);
+begin
+  FMembers.Objects[AIndex].Free;
+  FMembers.Delete(AIndex);
+end;
+
 procedure TGroup.SetLimit(const Value: Integer);
 begin
   if Value < 0 then
     FLimit := GROUP_UNLIMITED
   else
     FLimit := Value;
-end;
-
-procedure TGroup.RemoveMember(const AIndex: Integer);
-begin
-  FMembers.Objects[AIndex].Free;
-  FMembers.Delete(AIndex);
 end;
 
 end.

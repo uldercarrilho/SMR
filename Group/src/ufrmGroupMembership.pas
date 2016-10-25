@@ -55,7 +55,7 @@ var
 implementation
 
 uses
-  System.SyncObjs, uGMS.Member, uGMS.Service;
+  System.SyncObjs, uGMS.Member, uGMS.Service, uSequencerClient;
 
 {$R *.dfm}
 
@@ -84,7 +84,7 @@ end;
 procedure TfrmGroupMembership.CreateGroups;
 begin
   FGroupClients := GMSManager.CreateGroup('Clients');
-  FGroupPrimary := GMSManager.CreateGroup('Primary', 1, gaRestrict, 'Clients');
+  FGroupPrimary := GMSManager.CreateGroup('Primary', 1, gaRestrict, 'Clients,Backup');
   FGroupBackup := GMSManager.CreateGroup('Backup', GROUP_UNLIMITED, gaRestrict, 'Primary');
 end;
 
@@ -96,9 +96,9 @@ end;
 
 procedure TfrmGroupMembership.DestroyGroups;
 begin
-  FGroupBackup := nil;
-  FGroupPrimary := nil;
   FGroupClients := nil;
+  FGroupPrimary := nil;
+  FGroupBackup := nil;
 
   GMSManager.DestroyGroup('Clients');
   GMSManager.DestroyGroup('Primary');
@@ -151,7 +151,8 @@ begin
     Exit;
 
   Member := FGroupBackup.Member[0];
-  GMSManager.Join(Member.Id, Member.Address, Member.Kind, 'Primary');
+  GMSManager.Join(Member.Id, Member.Address, Member.ImageIndex, 'Primary');
+  GMSManager.SendMessage(Member.Id, 'Primary', CMD_UPDATE_MODE_TO_PRIMARY);
   GMSManager.Leave(Member.Id, 'Backup');
 end;
 
@@ -168,7 +169,7 @@ begin
 
     Item := AListView.Items.Add;
     Item.Caption := Member.Id;
-    Item.ImageIndex := Member.Kind;
+    Item.ImageIndex := Member.ImageIndex;
   end;
 end;
 
