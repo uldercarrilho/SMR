@@ -9,7 +9,7 @@ type
   {$METHODINFO ON}
   TGMService = class(TComponent)
   public
-    procedure Join(const AMemberId, AMemberAddress: string; AMemberType: Byte; const AGroupName: string);
+    procedure Join(const AMemberId, AMemberAddress: string; AMemberImageIndex: Byte; const AGroupName: string);
     procedure Leave(const AMemberId, AGroupName: string);
     function SendMessage(const ASenderId, AGroupName, AMessage: string): string;
 
@@ -44,12 +44,12 @@ begin
   end;
 end;
 
-procedure TGMService.Join(const AMemberId, AMemberAddress: string; AMemberType: Byte;
+procedure TGMService.Join(const AMemberId, AMemberAddress: string; AMemberImageIndex: Byte;
   const AGroupName: string);
 begin
   CSGMSManager.Enter;
   try
-    GMSManager.Join(AMemberId, AMemberAddress, AMemberType, AGroupName);
+    GMSManager.Join(AMemberId, AMemberAddress, AMemberImageIndex, AGroupName);
   finally
     CSGMSManager.Leave;
   end;

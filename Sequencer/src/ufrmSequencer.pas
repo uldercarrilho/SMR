@@ -136,7 +136,7 @@ begin
   if rbBackup.Checked then
   begin
     PrimarySequence := FGroupMembership.SendMessage(FId, 'Primary', CMD_GET_SEQUENCE);
-    SequenceOrder := StrToInt(Fetch(PrimarySequence, '|'));
+    SequenceOrder := StrToIntDef(Fetch(PrimarySequence, '|'), 0);
   end;
 end;
 
@@ -164,8 +164,13 @@ end;
 
 procedure TfrmSequencer.UnregisterService;
 begin
-  if Assigned(FGroupMembership) then
+  if not Assigned(FGroupMembership) then
+    Exit;
+
+  try
     FGroupMembership.Leave(FId, GetGroupName);
+  except
+  end;
 end;
 
 procedure TfrmSequencer.DisconnectGroupMembership;

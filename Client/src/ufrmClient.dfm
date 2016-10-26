@@ -2,9 +2,10 @@ object frmClient: TfrmClient
   Left = 0
   Top = 0
   BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
   Caption = 'Client'
   ClientHeight = 240
-  ClientWidth = 528
+  ClientWidth = 531
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

@@ -37,6 +37,7 @@ type
     FGroupBackup: TGroup;
     FGroupPrimary: TGroup;
     FGroupClients: TGroup;
+    procedure ClearListViews;
     procedure RefreshMembers;
     procedure ChooseNewPrimary;
     procedure UpdateVisualControls;
@@ -92,6 +93,7 @@ procedure TfrmGroupMembership.StopService;
 begin
   DSServer.Stop;
   DestroyGroups;
+  ClearListViews;
 end;
 
 procedure TfrmGroupMembership.DestroyGroups;
@@ -103,6 +105,13 @@ begin
   GMSManager.DestroyGroup('Clients');
   GMSManager.DestroyGroup('Primary');
   GMSManager.DestroyGroup('Backup');
+end;
+
+procedure TfrmGroupMembership.ClearListViews;
+begin
+  lvClients.Items.Clear;
+  lvPrimary.Items.Clear;
+  lvBackup.Items.Clear;
 end;
 
 procedure TfrmGroupMembership.DSServerClassGetClass(DSServerClass: TDSServerClass; var PersistentClass: TPersistentClass);
@@ -126,6 +135,7 @@ end;
 procedure TfrmGroupMembership.tmrStatusTimer(Sender: TObject);
 begin
   RefreshMembers;
+  ClearListViews;
   UpdateListView(lvClients, FGroupClients);
   UpdateListView(lvPrimary, FGroupPrimary);
   UpdateListView(lvBackup, FGroupBackup);
@@ -162,7 +172,6 @@ var
   Member: TMember;
   Item: TListItem;
 begin
-  AListView.Items.Clear;
   for i := 0 to AGroup.MemberCount - 1 do
   begin
     Member := AGroup.Member[i];

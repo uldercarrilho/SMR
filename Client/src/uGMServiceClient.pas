@@ -20,7 +20,7 @@ type
     constructor Create(ADBXConnection: TDBXConnection); overload;
     constructor Create(ADBXConnection: TDBXConnection; AInstanceOwner: Boolean); overload;
     destructor Destroy; override;
-    procedure Join(AMemberId: string; AMemberAddress: string; AMemberType: Byte; AGroupName: string);
+    procedure Join(AMemberId: string; AMemberAddress: string; AMemberImageIndex: Byte; AGroupName: string);
     procedure Leave(AMemberId: string; AGroupName: string);
     function SendMessage(ASenderId: string; AGroupName: string; AMessage: string): string;
     function GetMembersAddress(AGroupName: string): string;
@@ -28,7 +28,7 @@ type
 
 implementation
 
-procedure TGMServiceClient.Join(AMemberId: string; AMemberAddress: string; AMemberType: Byte; AGroupName: string);
+procedure TGMServiceClient.Join(AMemberId: string; AMemberAddress: string; AMemberImageIndex: Byte; AGroupName: string);
 begin
   if FJoinCommand = nil then
   begin
@@ -39,7 +39,7 @@ begin
   end;
   FJoinCommand.Parameters[0].Value.SetWideString(AMemberId);
   FJoinCommand.Parameters[1].Value.SetWideString(AMemberAddress);
-  FJoinCommand.Parameters[2].Value.SetUInt8(AMemberType);
+  FJoinCommand.Parameters[2].Value.SetUInt8(AMemberImageIndex);
   FJoinCommand.Parameters[3].Value.SetWideString(AGroupName);
   FJoinCommand.ExecuteUpdate;
 end;
